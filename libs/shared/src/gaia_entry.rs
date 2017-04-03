@@ -31,9 +31,9 @@ impl AstrometricPrior {
 
 // For more info, see https://gaia.esac.esa.int/documentation/GDR1/datamodel/Ch1/tgas_source.html
 #[derive(Debug)]
-pub struct GaiaEntry<'a> {
+pub struct GaiaEntry {
     pub hip: Option<i32>,
-    pub tycho2_id: Option<&'a str>,
+    pub tycho2_id: Option<String>,
     pub solution_id: u64,
     pub source_id: u64,
     pub random_index: u64,
@@ -86,20 +86,20 @@ pub struct GaiaEntry<'a> {
     pub phot_g_mean_flux: f64,
     pub phot_g_mean_flux_error: f64,
     pub phot_g_mean_mag: f64,
-    pub phot_variable_flag: &'a str,
+    pub phot_variable_flag: String,
     pub l: f64,
     pub b: f64,
     pub ecl_lon: f64,
     pub ecl_lat: f64,
 }
 
-impl<'a> GaiaEntry<'a> {
-    pub fn from_line(line: &str) -> Option<GaiaEntry> {
+impl GaiaEntry {
+    pub fn from_line(line: String) -> Option<GaiaEntry> {
         let mut split = line.split(',');
 
         Some(GaiaEntry {
             hip: get_optional_i32!(split.next(), "hip"),
-            tycho2_id: get_optional_string!(split.next(), "tycho2_id"),
+            tycho2_id: get_optional_string!(split.next(), "tycho2_id").map(String::from),
             solution_id: try_get_u64!(split.next(), "solution_id"),
             source_id: try_get_u64!(split.next(), "source_id"),
             random_index: try_get_u64!(split.next(), "random_index"),
@@ -152,7 +152,7 @@ impl<'a> GaiaEntry<'a> {
             phot_g_mean_flux: try_get_f64!(split.next(), "phot_g_mean_flux"),
             phot_g_mean_flux_error: try_get_f64!(split.next(), "phot_g_mean_flux_error"),
             phot_g_mean_mag: try_get_f64!(split.next(), "phot_g_mean_mag"),
-            phot_variable_flag: try_get_nonempty_string!(split.next(), "phot_variable_flag"),
+            phot_variable_flag: String::from(try_get_nonempty_string!(split.next(), "phot_variable_flag")),
             l: try_get_f64!(split.next(), "l"),
             b: try_get_f64!(split.next(), "b"),
             ecl_lon: try_get_f64!(split.next(), "ecl_lon"),
